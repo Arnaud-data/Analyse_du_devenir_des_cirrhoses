@@ -1,0 +1,11 @@
+X_test = wrangle("/kaggle/input/master-econometrie-et-statistiques/test.csv")
+
+y_pred_proba_test = pipeline.predict_proba(X_test.drop(columns=['id']))
+
+submission = pd.DataFrame(
+    y_pred_proba_test,
+    columns=['C', 'CL', 'D']
+)
+submission['id'] = X_test['id']
+submission = submission[['id', 'C', 'CL', 'D']]
+submission.to_csv("submission.csv", index=False)
