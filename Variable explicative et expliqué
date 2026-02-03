@@ -1,0 +1,8 @@
+df = wrangle("/kaggle/input/master-econometrie-et-statistiques/train.csv")
+
+var_exp = "Status"
+X = df.drop(columns=[var_exp, 'id'])
+y = df[var_exp]
+
+le = LabelEncoder()
+y_enc = le.fit_transform(y)
