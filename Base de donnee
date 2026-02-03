@@ -1,0 +1,161 @@
+def wrangle(chemin_fichier: str):
+    """
+    - Transformer la base de données en type pandas dataframe.
+    
+    - Nettoyage des variables qualitatives : Créer une catégorie "Missing" pour les 
+    valeurs manquantes et aberrantes.
+    
+    - Nettoyage des variables continues : Créer une variable binaire qui prends 1
+    si la valeur est manquante. Clipper les valeurs non manquantes aux quantiles 
+    0.01 et 0.99. Appliquer la fonction logarithme sur certaines variables.
+    
+    - Retourne la base de données néttoyée au type pandas dataframe.
+    """
+    
+    df = pd.read_csv(chemin_fichier)
+
+    #"Drug" :
+    df['Drug'] = df['Drug'].fillna('Missing')
+    K_drugs = ['Placebo', 'D-penicillamine', 'Missing']
+    df.loc[~df['Drug'].isin(K_drugs), 'Drug'] = 'Missing'
+
+    #"Sex" :
+    df['Sex'] = df['Sex'].fillna('Missing')
+    K_sex = ['F', 'H', 'Missing']
+    df.loc[~df['Sex'].isin(K_sex), 'Sex'] = 'Missing'
+
+    #"Ascites" :
+    df['Ascites'] = df['Ascites'].fillna('Missing')
+    K_ascites = ['N', 'Y', 'Missing']
+    df.loc[~df['Ascites'].isin(K_ascites), 'Ascites'] = 'Missing'
+
+    #"Hepatomegaly" :
+    df['Hepatomegaly'] = df['Hepatomegaly'].fillna('Missing')
+    K_hepatomegaly = ['N', 'Y', 'Missing']
+    df.loc[~df['Hepatomegaly'].isin(K_hepatomegaly), 'Hepatomegaly'] = 'Missing'
+
+    #"Spiders" :
+    df['Spiders'] = df['Spiders'].fillna('Missing')
+    K_spiders = ['N', 'Y', 'Missing']
+    df.loc[~df['Spiders'].isin(K_spiders), 'Spiders'] = 'Missing'
+
+    #"Edema" :
+    df['Edema'] = df['Edema'].fillna('Missing')
+    K_edema = ['N', 'Y', 'S','Missing']
+    df.loc[~df['Edema'].isin(K_edema), 'Edema'] = 'Missing'
+
+    #"Stage" :
+    df['Stage'] = df['Stage'].fillna('Missing')
+    df['Stage'] = df['Stage'].astype(str)
+    K_stage = ['1', '2', '3','4', 'Missing']
+    df.loc[~df['Stage'].isin(K_stage), 'Stage'] = 'Missing'
+
+
+
+    #"N_Days" :
+    df["N_Days_missing"] = df['N_Days'].isna().astype(int)
+    
+    quantile_bas = 77
+    quantile_haut = 4500
+    quantiles = df['N_Days'].notna()
+    df.loc[quantiles, 'N_Days'] = df.loc[quantiles, 'N_Days'].clip(quantile_bas, quantile_haut)
+
+    #"Age" :
+    df["Age_missing"] = df['Age'].isna().astype(int)
+
+    quantile_bas = 11773
+    quantile_haut = 25899
+    quantiles = df['Age'].notna()
+    df.loc[quantiles, 'Age'] = df.loc[quantiles, 'Age'].clip(quantile_bas, quantile_haut)
+
+    #"Bilirubin" :
+    df["Bilirubin_missing"] = df['Bilirubin'].isna().astype(int)
+    
+    quantile_bas = 0.4
+    quantile_haut = 16.2
+    quantiles = df['Bilirubin'].notna()
+    df.loc[quantiles, 'Bilirubin'] = df.loc[quantiles, 'Bilirubin'].clip(quantile_bas, quantile_haut)
+
+    df.loc[quantiles, 'Bilirubin_log'] = np.log(df.loc[quantiles, 'Bilirubin'])
+    df = df.drop(columns = "Bilirubin")
+
+    #"Cholesterol" :
+    df["Cholesterol_missing"] = df['Cholesterol'].isna().astype(int)
+    
+    quantile_bas = 132
+    quantile_haut = 1276
+    quantiles = df['Cholesterol'].notna()
+    df.loc[quantiles, 'Cholesterol'] = df.loc[quantiles, 'Cholesterol'].clip(quantile_bas, quantile_haut)
+
+    df.loc[quantiles, 'Cholesterol_log'] = np.log(df.loc[quantiles, 'Cholesterol'])
+    df = df.drop(columns = "Cholesterol")
+
+    #"Albumin" :
+    df["Albumin_missing"] = df['Albumin'].isna().astype(int)
+    
+    quantile_bas = 2.48
+    quantile_haut = 4.38
+    quantiles = df['Albumin'].notna()
+    df.loc[quantiles, 'Albumin'] = df.loc[quantiles, 'Albumin'].clip(quantile_bas, quantile_haut)
+
+    #"Copper" :
+    df["Copper_missing"] = df['Copper'].isna().astype(int)
+    
+    quantile_bas = 10
+    quantile_haut = 444
+    quantiles = df['Copper'].notna()
+    df.loc[quantiles, 'Copper'] = df.loc[quantiles, 'Copper'].clip(quantile_bas, quantile_haut)
+
+    df.loc[quantiles, 'Copper_log'] = np.log(df.loc[quantiles, 'Copper'])
+    df = df.drop(columns = "Copper")
+    
+    #"Alk_Phos" :
+    df["Alk_Phos_missing"] = df['Alk_Phos'].isna().astype(int)
+    
+    quantile_bas = 377
+    quantile_haut = 9933.2
+    quantiles = df['Alk_Phos'].notna()
+    df.loc[quantiles, 'Alk_Phos'] = df.loc[quantiles, 'Alk_Phos'].clip(quantile_bas, quantile_haut)
+
+    df.loc[quantiles, 'Alk_Phos_log'] = np.log(df.loc[quantiles, 'Alk_Phos'])
+    df = df.drop(columns = "Alk_Phos")
+    
+    #"SGOT" :
+    df["SGOT_missing"] = df['SGOT'].isna().astype(int)
+    
+    quantile_bas = 41.85
+    quantile_haut = 299.15
+    quantiles = df['SGOT'].notna()
+    df.loc[quantiles, 'SGOT'] = df.loc[quantiles, 'SGOT'].clip(quantile_bas, quantile_haut)
+
+    df.loc[quantiles, 'SGOT_log'] = np.log(df.loc[quantiles, 'SGOT'])
+    df = df.drop(columns = "SGOT")
+    
+    #"Tryglicerides" :
+    df["Tryglicerides_missing"] = df['Tryglicerides'].isna().astype(int)
+    
+    quantile_bas = 46
+    quantile_haut = 272
+    quantiles = df['Tryglicerides'].notna()
+    df.loc[quantiles, 'Tryglicerides'] = df.loc[quantiles, 'Tryglicerides'].clip(quantile_bas, quantile_haut)
+
+    df.loc[quantiles, 'Tryglicerides_log'] = np.log(df.loc[quantiles, 'Tryglicerides'])
+    df = df.drop(columns = "Tryglicerides")
+    
+    #"Platelets" :
+    df["Platelets_missing"] = df['Platelets'].isna().astype(int)
+    
+    quantile_bas = 80
+    quantile_haut = 514
+    quantiles = df['Platelets'].notna()
+    df.loc[quantiles, 'Platelets'] = df.loc[quantiles, 'Platelets'].clip(quantile_bas, quantile_haut)
+    
+    #"Prothrombin" :
+    df["Prothrombin_missing"] = df['Prothrombin'].isna().astype(int)
+    
+    quantile_bas = 9.5
+    quantile_haut = 13.2
+    quantiles = df['Prothrombin'].notna()
+    df.loc[quantiles, 'Prothrombin'] = df.loc[quantiles, 'Prothrombin'].clip(quantile_bas, quantile_haut)
+    
+    return df
