@@ -1,0 +1,12 @@
+var_num = X.select_dtypes(include=['int64', 'float64']).columns
+var_qual = X.select_dtypes(include=['object', 'category']).columns
+
+num_imputer = SimpleImputer(strategy='mean')
+qual_encoder = OneHotEncoder(handle_unknown='ignore')
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', num_imputer, var_num),
+        ('qual', qual_encoder, var_qual)
+    ]
+)
